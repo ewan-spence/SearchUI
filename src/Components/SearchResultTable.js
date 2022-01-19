@@ -1,7 +1,7 @@
 import { isNullOrUndefined, isObject } from '@syncfusion/ej2-base';
 import Table from 'react-bootstrap/Table';
 
-function SearchResultTable({ sections, results, ...rest }) {
+function SearchResultTable({ sections, results, tableStyle }) {
     return sections.map(resultType => {
         var resultsOfType = results[resultType.toLowerCase()]
         if (resultsOfType === undefined || resultsOfType.length === 0) {
@@ -10,7 +10,7 @@ function SearchResultTable({ sections, results, ...rest }) {
             return (<div>
                 <h3>{resultType}</h3>
 
-                <Table bordered hover>
+                <Table style={tableStyle} bordered hover>
                     <thead>
                         <tr>
                             {Object.keys(resultsOfType[0]).map(field => {

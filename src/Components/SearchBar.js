@@ -83,7 +83,7 @@ function SearchBar({ filterOptions, setResults, ...rest }) {
                         </Dropdown.Menu>
                     </Dropdown>
 
-                    <Form>
+                    <Form onSubmit={onSubmit}>
                         <Form.Group id="search" controlId="searchinput" >
                             <Form.Control style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} ref={focusRef} placeholder="Search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
                         </Form.Group>
