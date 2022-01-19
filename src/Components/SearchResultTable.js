@@ -14,9 +14,9 @@ function SearchResultTable({ sections, results, ...rest }) {
                     <thead>
                         <tr>
                             {Object.keys(resultsOfType[0]).map(field => {
-                                if (isObject(resultsOfType[0][field])) return null;
+                                if (isObject(resultsOfType[0][field])) return <td>{capitalize(field)} Name</td>
                                 if (isNullOrUndefined(resultsOfType[0][field])) return null;
-                                if (field === "id") return null;
+                                if (field.toLowerCase().includes("id")) return null;
 
                                 return <td>{formatFieldName(field)}</td>
                             })}
@@ -26,9 +26,9 @@ function SearchResultTable({ sections, results, ...rest }) {
                         {resultsOfType.map(result => {
                             return <tr>
                                 {Object.values(result).map((value, index) => {
-                                    if (isObject(value)) return null;
+                                    if (isObject(value)) return <td>{value["name"]}</td>;
                                     if (isNullOrUndefined(value)) return null;
-                                    if (Object.keys(result)[index] === "id") return null;
+                                    if (Object.keys(result)[index].toLowerCase().includes("id")) return null;
 
                                     return <td>{value}</td>
                                 })}
