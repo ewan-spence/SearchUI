@@ -24,6 +24,9 @@ function SearchBar({ filterOptions, setResults, ...rest }) {
             .then(res => {
                 setResults(res.data);
             })
+            .catch(_ => {
+                setResults({});
+            })
     }
 
     const removeFilter = (event) => {

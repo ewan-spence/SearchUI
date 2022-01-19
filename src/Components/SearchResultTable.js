@@ -7,33 +7,36 @@ function SearchResultTable({ sections, results, ...rest }) {
         if (resultsOfType === undefined || resultsOfType.length === 0) {
             return null;
         } else {
-            return <Table bordered hover>
-                <thead>
-                    <tr>{resultType}</tr>
-                    <tr>
-                        {Object.keys(resultsOfType[0]).map(field => {
-                            if (isObject(resultsOfType[0][field])) return null;
-                            if (isNullOrUndefined(resultsOfType[0][field])) return null;
-                            if (field === "id") return null;
+            return (<div>
+                <h3>{resultType}</h3>
 
-                            return <td>{formatFieldName(field)}</td>
-                        })}
-                    </tr>
-                </thead>
-                <tbody>
-                    {resultsOfType.map(result => {
-                        return <tr>
-                            {Object.values(result).map((value, index) => {
-                                if (isObject(value)) return null;
-                                if (isNullOrUndefined(value)) return null;
-                                if (Object.keys(result)[index] === "id") return null;
+                <Table bordered hover>
+                    <thead>
+                        <tr>
+                            {Object.keys(resultsOfType[0]).map(field => {
+                                if (isObject(resultsOfType[0][field])) return null;
+                                if (isNullOrUndefined(resultsOfType[0][field])) return null;
+                                if (field === "id") return null;
 
-                                return <td>{value}</td>
+                                return <td>{formatFieldName(field)}</td>
                             })}
                         </tr>
-                    })}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {resultsOfType.map(result => {
+                            return <tr>
+                                {Object.values(result).map((value, index) => {
+                                    if (isObject(value)) return null;
+                                    if (isNullOrUndefined(value)) return null;
+                                    if (Object.keys(result)[index] === "id") return null;
+
+                                    return <td>{value}</td>
+                                })}
+                            </tr>
+                        })}
+                    </tbody>
+                </Table>
+            </div>)
         }
     });
 }
