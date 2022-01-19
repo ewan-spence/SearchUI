@@ -14,7 +14,7 @@ import { useState } from 'react';
 function App() {
   var sections = ["Reports", "Clients", "Portfolios"];
 
-  const [results, setResults] = useState({})
+  const [results, setResults] = useState({});
 
   return (
     <div className="App">
