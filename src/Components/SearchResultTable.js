@@ -42,6 +42,8 @@ function SearchResultTable({ sections, results, tableStyle }) {
                                         return <td>{dateValue.toLocaleDateString()} {dateValue.toLocaleTimeString()}</td>;
                                     }
 
+                                    if (!isNaN(value) && !isNaN(parseFloat(value))) return formatMoney(value);
+
                                     return <td>{value}</td>
                                 })}
                             </tr>
@@ -61,6 +63,10 @@ function formatFieldName(stringField) {
 
 function capitalize(word) {
     return word.charAt(0).toUpperCase() + word.substring(1);
+}
+
+function formatMoney(valueString) {
+    return "£".concat(valueString.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 }
 
 export default SearchResultTable;
