@@ -13,6 +13,9 @@ import { useState } from 'react';
 
 function App() {
   var sections = ["Reports", "Clients", "Portfolios"];
+  var sorts = [{ displayName: "name", keyword: "Name" },
+  { displayName: "joined date", keyword: "Joined" },
+  { displayName: "portfolio value", keyword: "Value" }]
 
   const [results, setResults] = useState({});
 
@@ -21,7 +24,7 @@ function App() {
       <Navbar bg="dark">
         <Container>
           <Col style={{ alignItems: "center" }}>
-            <SearchBar filterOptions={sections} setResults={setResults} />
+            <SearchBar filterOptions={sections} sortOptions={sorts} setResults={setResults} />
           </Col>
         </Container>
       </Navbar>
