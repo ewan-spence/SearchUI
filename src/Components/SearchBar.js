@@ -74,7 +74,7 @@ function SearchBar({ filterOptions, setResults, ...rest }) {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={removeFilter}>
+                            <Dropdown.Item id="" onClick={onFilterSelect}>
                                 Search for everything
                             </Dropdown.Item>
                             {filterOptions.map((option) => {
