@@ -15,7 +15,11 @@ function SearchResultTable({ sections, results, tableStyle }) {
                     <thead>
                         <tr>
                             {Object.keys(resultsOfType[0]).map(field => {
-                                if (isObject(resultsOfType[0][field])) return <td>{capitalize(field)} Name</td>
+                                if (isObject(resultsOfType[0][field])) {
+                                    var fieldName = (field.toLowerCase() === "portfolio") ? "Value" : "Name"
+
+                                    return <td>{capitalize(field)} {fieldName}</td>
+                                }
                                 if (isNullOrUndefined(resultsOfType[0][field])) return null;
                                 if (field.toLowerCase().includes("id")) return null;
 
@@ -27,8 +31,16 @@ function SearchResultTable({ sections, results, tableStyle }) {
                         {resultsOfType.map(result => {
                             return <tr>
                                 {Object.values(result).map((value, index) => {
+
+
                                     // Only show the name field of embedded objects
-                                    if (isObject(value)) return <td>{value["name"]}</td>;
+                                    if (isObject(value)) {
+                                        if (value["name"] === undefined) {
+                                            return <td>{formatMoney(value["value"])}</td>
+                                        } else {
+                                            return <td>{value["name"]}</td>;
+                                        }
+                                    }
 
                                     // Ignore any null values
                                     if (isNullOrUndefined(value)) return null;
