@@ -10,8 +10,7 @@ const useFocus = () => {
     return [htmlElRef, setFocus]
 }
 
-function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
-    const [searchTerm, setSearchTerm] = useState("");
+function SearchBar({ filterOptions, sortOptions, searchTerm, setSearchTerm, setResults, ...rest }) {
 
     const [focusRef, setFocus] = useFocus();
 
