@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Container, Dropdown, Form, Row, Stack } from "react-bootstrap";
 
 const axios = require('axios');
@@ -14,6 +14,26 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
     const [searchTerm, setSearchTerm] = useState("");
 
     const [focusRef, setFocus] = useFocus();
+
+    const [filter, setFilter] = useState("clients");
+
+    const [canSort, setCanSort] = useState(false);
+
+    useEffect(() => {
+        var searchList = searchTerm.split(";").map(term => term.trim());
+
+        searchList.forEach(term => {
+            if (term.startsWith('@')) {
+                var check = term.substring(1).toLowerCase()
+
+                if (Object.keys(sortOptions).includes(check)) {
+                    setFilter(check);
+                    setCanSort(true);
+                }
+                else setCanSort(false);
+            };
+        });
+    }, [searchTerm])
 
     const onSubmit = (event) => {
         event.preventDefault();
@@ -122,7 +142,7 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
 
                     {/* Sorts */}
                     <Dropdown autoclose={true}>
-                        <Dropdown.Toggle disabled={!searchTerm.includes('@')} style={{ borderRadius: 0 }}>
+                        <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
                             Sort (Ascending)
                         </Dropdown.Toggle>
 
@@ -130,13 +150,13 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
                             <Dropdown.Item id="" onClick={removeSort}>
                                 Default sort
                             </Dropdown.Item>
-                            {sortOptions.map((option) => {
+                            {sortOptions[filter].map((option) => {
                                 return <Dropdown.Item id={"/".concat(option.keyword)} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown>
-                        <Dropdown.Toggle disabled={!searchTerm.includes('@')} style={{ borderRadius: 0 }}>
+                        <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
                             Sort (Descending)
                         </Dropdown.Toggle>
 
@@ -144,7 +164,7 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
                             <Dropdown.Item id="" onClick={removeSort}>
                                 Default sort
                             </Dropdown.Item>
-                            {sortOptions.map((option) => {
+                            {sortOptions[filter].map((option) => {
                                 return <Dropdown.Item id={"\\".concat(option.keyword)} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
                             })}
                         </Dropdown.Menu>

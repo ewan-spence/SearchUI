@@ -13,9 +13,21 @@ import { useState } from 'react';
 
 function App() {
   var sections = ["Reports", "Clients", "Portfolios"];
-  var sorts = [{ displayName: "name", keyword: "Name" },
-  { displayName: "joined date", keyword: "Joined" },
-  { displayName: "portfolio value", keyword: "Value" }]
+  var sorts = {
+    clients: [
+      { displayName: "name", keyword: "Name" },
+      { displayName: "joined date", keyword: "Joined" },
+      { displayName: "portfolio value", keyword: "Value" }
+    ],
+    portfolios: [
+      { displayName: "value", keyword: "Value" },
+      { displayName: "client name", keyword: "Client" }],
+    reports: [
+      { displayName: "updated date", keyword: "Updated" },
+      { displayName: "created date", keyword: "Created" },
+      { displayName: "report name", keyword: "Name" },
+      { displayName: "client name", keyword: "Client" }]
+  }
 
   const [results, setResults] = useState({});
 
