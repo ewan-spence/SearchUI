@@ -122,7 +122,7 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
 
                     {/* Sorts */}
                     <Dropdown autoclose={true}>
-                        <Dropdown.Toggle style={{ borderRadius: 0 }}>
+                        <Dropdown.Toggle disabled={!searchTerm.includes('@')} style={{ borderRadius: 0 }}>
                             Sort (Ascending)
                         </Dropdown.Toggle>
 
@@ -136,7 +136,7 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
                         </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown>
-                        <Dropdown.Toggle style={{ borderRadius: 0 }}>
+                        <Dropdown.Toggle disabled={!searchTerm.includes('@')} style={{ borderRadius: 0 }}>
                             Sort (Descending)
                         </Dropdown.Toggle>
 
@@ -163,7 +163,7 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
         <Row>
 
         </Row>
-    </Container>
+    </Container >
 
 }
 
