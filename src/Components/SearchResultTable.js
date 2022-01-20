@@ -49,7 +49,7 @@ function SearchResultTable({ sections, results, tableStyle }) {
                                     if (Object.keys(result)[index].toLowerCase().includes("id")) return null;
 
                                     // Format currency
-                                    if (!isNaN(value) && !isNaN(parseFloat(value))) return formatMoney(value);
+                                    if (!isNaN(value) && !isNaN(parseFloat(value))) return <td>{formatMoney(value)}</td>;
 
                                     // Format dates in a readable way
                                     if (moment(value, moment.ISO_8601, true).isValid()) {
