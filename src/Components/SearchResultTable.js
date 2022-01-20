@@ -28,7 +28,7 @@ function SearchResultTable({ sections, results, tableStyle }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {resultsOfType.map(result => {
+                        {resultsOfType.slice(0, 20).map(result => {
                             return <tr>
                                 {Object.values(result).map((value, index) => {
 
@@ -48,13 +48,14 @@ function SearchResultTable({ sections, results, tableStyle }) {
                                     // Ignore hard-to-read IDs
                                     if (Object.keys(result)[index].toLowerCase().includes("id")) return null;
 
+                                    // Format currency
+                                    if (!isNaN(value) && !isNaN(parseFloat(value))) return formatMoney(value);
+
                                     // Format dates in a readable way
                                     if (moment(value, moment.ISO_8601, true).isValid()) {
                                         var dateValue = new Date(value);
                                         return <td>{dateValue.toLocaleDateString()} {dateValue.toLocaleTimeString()}</td>;
                                     }
-
-                                    if (!isNaN(value) && !isNaN(parseFloat(value))) return formatMoney(value);
 
                                     return <td>{value}</td>
                                 })}
