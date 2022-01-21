@@ -53,27 +53,26 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
 
     const onSubmit = (event) => {
         event.preventDefault();
-        dispatch(set({}));
 
         if (searchTerm.includes("@")) {
-            searchWithFilter(searchTerm, filter.toLowerCase());
+            searchWithFilter(searchTerm, filter.toLowerCase(), set);
         } else {
             filterOptions.forEach((option) => {
                 var filteredSearchTerm = `@${option}; ` + searchTerm;
 
-                searchWithFilter(filteredSearchTerm, option.toLowerCase());
+                searchWithFilter(filteredSearchTerm, option.toLowerCase(), add);
             })
         }
     }
 
-    const searchWithFilter = (requestString, resultType) => {
+    const searchWithFilter = (requestString, resultType, action) => {
         trigger(requestString)
             .then(response => {
                 var payload = {
                     resultType,
                     data: response.data[resultType]
                 };
-                dispatch(add(payload));
+                dispatch(action(payload));
             });
     }
 

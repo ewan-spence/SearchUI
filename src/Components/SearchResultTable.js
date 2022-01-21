@@ -9,10 +9,6 @@ import { selectResults } from '../App/resultsSlice';
 function SearchResultTable({ sections, tableStyle }) {
     const results = useSelector(selectResults);
 
-    useEffect(() => {
-        console.log(results);
-    })
-
     return sections.map(resultType => {
         var resultsOfType = results[resultType.toLowerCase()]
         if (resultsOfType === undefined || resultsOfType.length === 0) {
