@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Container, Dropdown, Form, Row, Stack } from "react-bootstrap";
 
-const axios = require('axios');
+import { useLazySearchQuery } from '../App/searchApi';
+
+import { add, set } from '../App/resultsSlice';
+import { useDispatch } from "react-redux";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -10,14 +13,19 @@ const useFocus = () => {
     return [htmlElRef, setFocus]
 }
 
-function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
+function SearchBar({ filterOptions, sortOptions, ...rest }) {
+    sortOptions[""] = [];
+
     const [searchTerm, setSearchTerm] = useState("");
 
     const [focusRef, setFocus] = useFocus();
 
-    const [filter, setFilter] = useState("clients");
-
+    const [filter, setFilter] = useState("");
     const [canSort, setCanSort] = useState(false);
+
+    const [trigger] = useLazySearchQuery(searchTerm);
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         var searchList = searchTerm.split(";").map(term => term.trim());
@@ -45,17 +53,30 @@ function SearchBar({ filterOptions, sortOptions, setResults, ...rest }) {
 
     const onSubmit = (event) => {
         event.preventDefault();
+        dispatch(set({}));
 
-        var url = "https://localhost:44306/api/Search?search=" + searchTerm;
+        if (searchTerm.includes("@")) {
+            searchWithFilter(searchTerm, filter.toLowerCase());
+        } else {
+            filterOptions.forEach((option) => {
+                var filteredSearchTerm = `@${option}; ` + searchTerm;
 
-        axios.get(url)
-            .then(res => {
-                setResults(res.data);
+                searchWithFilter(filteredSearchTerm, option.toLowerCase());
             })
-            .catch(_ => {
-                setResults({});
-            })
+        }
     }
+
+    const searchWithFilter = (requestString, resultType) => {
+        trigger(requestString)
+            .then(response => {
+                var payload = {
+                    resultType,
+                    data: response.data[resultType]
+                };
+                dispatch(add(payload));
+            });
+    }
+
 
     const removeFilter = (newTerm) => {
         // Split the current input on ; and trim whitespace

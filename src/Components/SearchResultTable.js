@@ -1,8 +1,18 @@
 import { isNullOrUndefined, isObject } from '@syncfusion/ej2-base';
 import moment from 'moment';
+import { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 
-function SearchResultTable({ sections, results, tableStyle }) {
+import { useSelector } from 'react-redux';
+import { selectResults } from '../App/resultsSlice';
+
+function SearchResultTable({ sections, tableStyle }) {
+    const results = useSelector(selectResults);
+
+    useEffect(() => {
+        console.log(results);
+    })
+
     return sections.map(resultType => {
         var resultsOfType = results[resultType.toLowerCase()]
         if (resultsOfType === undefined || resultsOfType.length === 0) {
