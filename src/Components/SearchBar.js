@@ -163,7 +163,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
                     </Dropdown>
 
                     {/* Sorts */}
-                    <Dropdown autoclose={true}>
+                    <Dropdown>
                         <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
                             Sort (Ascending)
                         </Dropdown.Toggle>

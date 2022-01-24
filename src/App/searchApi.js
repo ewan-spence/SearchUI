@@ -6,8 +6,11 @@ export const searchApi = createApi({
     endpoints: (builder) => ({
         search: builder.query({
             query: (searchTerm) => `?search=${searchTerm}`
+        }),
+        getFilters: builder.query({
+            query: () => '/filters'
         })
     })
 })
 
-export const { useLazySearchQuery } = searchApi;
+export const { useLazySearchQuery, useGetFiltersQuery } = searchApi;

@@ -1,10 +1,10 @@
 import { isNullOrUndefined, isObject } from '@syncfusion/ej2-base';
 import moment from 'moment';
-import { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 
 import { useSelector } from 'react-redux';
 import { selectResults } from '../App/resultsSlice';
+import { capitalize, formatFieldName, formatMoney } from '../helpers';
 
 function SearchResultTable({ sections, tableStyle }) {
     const results = useSelector(selectResults);
@@ -37,7 +37,6 @@ function SearchResultTable({ sections, tableStyle }) {
                         {resultsOfType.slice(0, 20).map(result => {
                             return <tr>
                                 {Object.values(result).map((value, index) => {
-
 
                                     // Only show the name field of embedded objects
                                     if (isObject(value)) {
@@ -74,18 +73,5 @@ function SearchResultTable({ sections, tableStyle }) {
     });
 }
 
-function formatFieldName(stringField) {
-    var words = stringField.match(/[A-Za-z][a-z]*|[0-9]+/g) || []
-
-    return words.map(capitalize).join(" ");
-}
-
-function capitalize(word) {
-    return word.charAt(0).toUpperCase() + word.substring(1);
-}
-
-function formatMoney(valueString) {
-    return "£".concat(valueString.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-}
 
 export default SearchResultTable;

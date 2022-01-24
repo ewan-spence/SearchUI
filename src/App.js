@@ -2,6 +2,8 @@ import './App.css';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { useState } from 'react';
+
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
@@ -9,27 +11,30 @@ import Navbar from 'react-bootstrap/Navbar';
 import SearchBar from './Components/SearchBar';
 import SearchResultTable from './Components/SearchResultTable';
 
-import { useState } from 'react';
+import { useGetFiltersQuery } from './App/searchApi';
+import { capitalize } from './helpers';
 
 function App() {
-  var sections = ["Reports", "Clients", "Portfolios"];
-  var sorts = {
-    clients: [
-      { displayName: "name", keyword: "Name" },
-      { displayName: "joined date", keyword: "Joined" },
-      { displayName: "portfolio value", keyword: "Value" }
-    ],
-    portfolios: [
-      { displayName: "value", keyword: "Value" },
-      { displayName: "client name", keyword: "Client" }],
-    reports: [
-      { displayName: "updated date", keyword: "Updated" },
-      { displayName: "created date", keyword: "Created" },
-      { displayName: "report name", keyword: "Name" },
-      { displayName: "client name", keyword: "Client" }]
+
+  const { data, error, isLoading } = useGetFiltersQuery();
+
+  var sections = [];
+  var sorts = {};
+
+  if (!isLoading && !error) {
+    sections = data.map(section => capitalize(section.filter));
+    sorts = {};
+
+    data.forEach(section => {
+      sorts[section.filter] = section.sorts;
+    });
   }
 
   const [results, setResults] = useState({});
+
+  if (isLoading) {
+    return (<Container><h1>Retrieving Search Options</h1></Container>)
+  }
 
   return (
     <div className="App">
