@@ -10,5 +10,15 @@ export function capitalize(word) {
 }
 
 export function formatMoney(valueString) {
-    return "£".concat(valueString.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+    var splitOnDecimal = valueString.toString().split('.');
+    var pounds = splitOnDecimal[0];
+    var pence = splitOnDecimal[1];
+
+    if (pence === undefined) {
+        pence = "00";
+    } else {
+        pence = pence.substring(0, 2);
+    }
+
+    return `£${pounds.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${pence}`;
 }

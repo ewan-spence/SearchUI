@@ -32,10 +32,6 @@ function App() {
 
   const [results, setResults] = useState({});
 
-  if (isLoading) {
-    return (<Container><h1>Retrieving Search Options</h1></Container>)
-  }
-
   return (
     <div className="App">
       <Navbar bg="dark">
