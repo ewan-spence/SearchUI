@@ -22,3 +22,9 @@ export function formatMoney(valueString) {
 
     return `£${pounds.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${pence}`;
 }
+
+export function range(start, stop, step) {
+    console.log(start, stop, [start]);
+    if (start === stop) return [start];
+    return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + (i * step));
+}

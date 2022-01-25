@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Container, Dropdown, Form, Row, Stack } from "react-bootstrap";
 
-import { useLazySearchQuery } from '../App/searchApi';
-
 import { add, set } from '../App/resultsSlice';
 import { useDispatch } from "react-redux";
+// import { useLazySearchQuery } from "../App/searchApi";
+import { useSearchMutation } from "../App/searchApi";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -14,6 +14,8 @@ const useFocus = () => {
 }
 
 function SearchBar({ filterOptions, sortOptions, ...rest }) {
+    var itemsPerPage = 15;
+
     sortOptions[""] = [];
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +25,12 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
     const [filter, setFilter] = useState("");
     const [canSort, setCanSort] = useState(false);
 
-    const [trigger] = useLazySearchQuery(searchTerm);
+    const [
+        trigger,
+        { isLoading, data }
+    ] = useSearchMutation();
+
+    // const [trigger] = useLazySearchQuery();
 
     const dispatch = useDispatch();
 
@@ -66,7 +73,14 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
     }
 
     const searchWithFilter = (requestString, resultType, action) => {
-        trigger(requestString)
+        var body = {
+            search: requestString,
+            page: 1,
+            itemsPerPage
+        }
+
+        console.log(body);
+        trigger(body)
             .then(response => {
                 var payload = {
                     resultType,

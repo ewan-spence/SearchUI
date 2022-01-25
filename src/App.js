@@ -9,10 +9,10 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 
 import SearchBar from './Components/SearchBar';
-import SearchResultTable from './Components/SearchResultTable';
 
 import { useGetFiltersQuery } from './App/searchApi';
 import { capitalize } from './helpers';
+import SearchResults from './Components/SearchResults';
 
 function App() {
 
@@ -43,7 +43,7 @@ function App() {
       </Navbar>
 
       <Container className="mt-5">
-        <SearchResultTable sections={sections} results={results} />
+        <SearchResults sections={sections} results={results} />
       </Container>
     </div>
   );
