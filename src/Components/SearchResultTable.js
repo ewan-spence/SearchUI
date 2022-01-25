@@ -1,5 +1,6 @@
 import { isNullOrUndefined, isObject } from '@syncfusion/ej2-base';
 import moment from 'moment';
+import { Col, Container } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 
 import { capitalize, formatFieldName, formatMoney } from '../helpers';
@@ -8,7 +9,7 @@ import FullPagination from './FullPagination';
 
 function SearchResultTable({ resultType, resultsOfType, tableStyle, resultsPerPage, totalResults }) {
 
-    var totalPages = totalResults / resultsPerPage;
+    var totalPages = Math.ceil(totalResults / resultsPerPage);
 
     return <div>
         <h3>{resultType}</h3>

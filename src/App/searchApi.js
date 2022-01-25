@@ -11,7 +11,7 @@ export const searchApi = createApi({
                 return ({
                     url: '',
                     method: 'POST',
-                    body
+                    body: body
                 })
             }
         }),

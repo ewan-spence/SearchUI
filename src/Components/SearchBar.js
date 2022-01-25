@@ -79,12 +79,15 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
             itemsPerPage
         }
 
-        console.log(body);
         trigger(body)
+            .unwrap()
             .then(response => {
                 var payload = {
                     resultType,
-                    data: response.data[resultType]
+                    data: {
+                        documents: response[resultType],
+                        noDocuments: response.totalResults
+                    }
                 };
                 dispatch(action(payload));
             });

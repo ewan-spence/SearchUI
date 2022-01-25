@@ -24,7 +24,5 @@ export function formatMoney(valueString) {
 }
 
 export function range(start, stop, step) {
-    console.log(start, stop, [start]);
-    if (start === stop) return [start];
     return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + (i * step));
 }
