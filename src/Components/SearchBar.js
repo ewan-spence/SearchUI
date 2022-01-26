@@ -5,6 +5,7 @@ import { add, set } from '../App/resultsSlice';
 import { useDispatch } from "react-redux";
 import { useSearchMutation } from "../App/searchApi";
 import { addSearchTerm } from "../App/searchSlice";
+import FilterAutocomplete from "./FilterAutocomplete";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -216,7 +217,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
             </Stack>
         </Row>
         <Row>
-
+            <FilterAutocomplete searchInput={searchTerm} filters={filterOptions} />
         </Row>
     </Container >
 
