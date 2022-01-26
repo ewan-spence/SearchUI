@@ -3,8 +3,8 @@ import { Button, Container, Dropdown, Form, Row, Stack } from "react-bootstrap";
 
 import { add, set } from '../App/resultsSlice';
 import { useDispatch } from "react-redux";
-// import { useLazySearchQuery } from "../App/searchApi";
 import { useSearchMutation } from "../App/searchApi";
+import { addSearchTerm } from "../App/searchSlice";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -25,12 +25,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
     const [filter, setFilter] = useState("");
     const [canSort, setCanSort] = useState(false);
 
-    const [
-        trigger,
-        { isLoading, data }
-    ] = useSearchMutation();
-
-    // const [trigger] = useLazySearchQuery();
+    const [trigger] = useSearchMutation();
 
     const dispatch = useDispatch();
 
@@ -72,7 +67,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
         }
     }
 
-    const searchWithFilter = (requestString, resultType, action) => {
+    const searchWithFilter = (requestString, resultType, resultsAction) => {
         var body = {
             search: requestString,
             page: 1,
@@ -89,7 +84,8 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
                         noDocuments: response.totalResults
                     }
                 };
-                dispatch(action(payload));
+                dispatch(resultsAction(payload));
+                dispatch(addSearchTerm({ resultType, data: requestString }));
             });
     }
 

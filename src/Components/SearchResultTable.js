@@ -1,20 +1,53 @@
 import { isNullOrUndefined, isObject } from '@syncfusion/ej2-base';
 import moment from 'moment';
-import { Col, Container } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
+import { useDispatch } from 'react-redux';
+import { add } from '../App/resultsSlice';
+import { useSearchMutation } from '../App/searchApi';
 
 import { capitalize, formatFieldName, formatMoney } from '../helpers';
 import FullPagination from './FullPagination';
 
 
-function SearchResultTable({ resultType, resultsOfType, tableStyle, resultsPerPage, totalResults }) {
+function SearchResultTable({ search, resultType, resultsOfType, resultsPerPage, totalResults }) {
 
     var totalPages = Math.ceil(totalResults / resultsPerPage);
+
+    const [active, setActive] = useState(1);
+
+    const [trigger] = useSearchMutation();
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        var searchPaginationObject = {
+            search: search,
+            itemsPerPage: resultsPerPage,
+            page: active
+        }
+
+        trigger(searchPaginationObject)
+            .unwrap()
+            .then(response => {
+                var payload = {
+                    resultType: resultType.toLowerCase(),
+                    data: {
+                        documents: response[resultType.toLowerCase()],
+                        noDocuments: response.totalResults
+                    }
+                };
+
+                console.log(payload);
+
+                dispatch(add(payload));
+            })
+    }, [active, dispatch, resultType, resultsPerPage, search, trigger]);
 
     return <div>
         <h3>{resultType}</h3>
 
-        <Table style={tableStyle} bordered hover>
+        <Table bordered hover>
             <thead>
                 <tr>
                     {Object.keys(resultsOfType[0]).map(field => {
@@ -31,7 +64,7 @@ function SearchResultTable({ resultType, resultsOfType, tableStyle, resultsPerPa
                 </tr>
             </thead>
             <tbody>
-                {resultsOfType.slice(0, 20).map(result => {
+                {resultsOfType.map(result => {
                     return <tr>
                         {Object.values(result).map((value, index) => {
 
@@ -66,7 +99,7 @@ function SearchResultTable({ resultType, resultsOfType, tableStyle, resultsPerPa
             </tbody>
         </Table>
 
-        <FullPagination totalPages={totalPages} />
+        <FullPagination totalPages={totalPages} activePage={active} setActivePage={setActive} />
     </div>
 }
 

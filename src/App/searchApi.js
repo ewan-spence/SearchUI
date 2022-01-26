@@ -5,15 +5,11 @@ export const searchApi = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:44306/api/search' }),
     endpoints: (builder) => ({
         search: builder.mutation({
-            // search: builder.query({
-            query: ({ ...body }) => {
-                console.log(body);
-                return ({
-                    url: '',
-                    method: 'POST',
-                    body: body
-                })
-            }
+            query: ({ ...body }) => ({
+                url: '',
+                method: 'POST',
+                body: body
+            })
         }),
         getFilters: builder.query({
             query: () => '/filters'
@@ -22,6 +18,5 @@ export const searchApi = createApi({
 })
 
 export const {
-    // useLazySearchQuery, 
     useSearchMutation,
     useGetFiltersQuery } = searchApi;

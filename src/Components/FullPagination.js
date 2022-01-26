@@ -2,43 +2,41 @@ import { useState } from "react";
 import { Pagination } from "react-bootstrap";
 import { range } from "../helpers";
 
-function FullPagination({ totalPages }) {
+function FullPagination({ totalPages, activePage, setActivePage }) {
 
-    const [active, setActive] = useState(1);
-
-    const createPaginationItem = pageNo => <Pagination.Item active={pageNo === active} onClick={() => setActive(pageNo)}>{pageNo}</Pagination.Item>
+    const createPaginationItem = pageNo => <Pagination.Item active={pageNo === activePage} onClick={() => setActivePage(pageNo)}>{pageNo}</Pagination.Item>
 
     var beginning;
     var middle;
     var end
 
-    if (active > 5) {
+    if (activePage > 5) {
         beginning = <>
-            <Pagination.First onClick={() => setActive(1)} />
-            <Pagination.Prev onClick={() => setActive(active - 1)} />
+            <Pagination.First onClick={() => setActivePage(1)} />
+            <Pagination.Prev onClick={() => setActivePage(activePage - 1)} />
             <Pagination.Ellipsis disabled />
         </>
 
-        if (active < totalPages - 5) {
-            middle = range(active - 4, active + 4, 1).map(createPaginationItem)
+        if (activePage < totalPages - 5) {
+            middle = range(activePage - 4, activePage + 4, 1).map(createPaginationItem)
             end = <>
                 <Pagination.Ellipsis disabled />
-                <Pagination.Next onClick={() => setActive(active + 1)} />
-                <Pagination.Last onClick={() => setActive(totalPages)} />
+                <Pagination.Next onClick={() => setActivePage(activePage + 1)} />
+                <Pagination.Last onClick={() => setActivePage(totalPages)} />
             </>
         } else {
             middle = <></>
-            end = range(active - 4, totalPages, 1).map(createPaginationItem)
+            end = range(activePage - 4, totalPages, 1).map(createPaginationItem)
         }
     } else {
-        if (active !== 1) {
+        if (activePage !== 1) {
             beginning = <>
-                <Pagination.Prev onClick={() => setActive(active - 1)} />
-                {range(1, active + 4, 1).map(createPaginationItem)}
+                <Pagination.Prev onClick={() => setActivePage(activePage - 1)} />
+                {range(1, activePage + 4, 1).map(createPaginationItem)}
             </>
         } else {
             beginning = <>
-                {range(1, active + 4, 1).map(createPaginationItem)}
+                {range(1, activePage + 4, 1).map(createPaginationItem)}
             </>
         }
 
@@ -46,8 +44,8 @@ function FullPagination({ totalPages }) {
 
         end = <>
             <Pagination.Ellipsis disabled />
-            <Pagination.Next onClick={() => setActive(active + 1)} />
-            <Pagination.Last onClick={() => setActive(totalPages)} />
+            <Pagination.Next onClick={() => setActivePage(activePage + 1)} />
+            <Pagination.Last onClick={() => setActivePage(totalPages)} />
         </>
     }
 
@@ -56,37 +54,6 @@ function FullPagination({ totalPages }) {
         {middle}
         {end}
     </Pagination>
-
-    // if (active > 5) {
-
-    //     if (active < totalPages - 5) {
-    //         return <Pagination>
-    //             <Pagination.First onClick={() => setActive(1)} />
-    //             <Pagination.Prev onClick={() => setActive(active - 1)} />
-    //             <Pagination.Ellipsis disabled />
-    //             {range(active - 4, active + 4, 1).map(createPaginationItem)}
-    //             <Pagination.Ellipsis disabled />
-    //             <Pagination.Next onClick={() => setActive(active + 1)} />
-    //             <Pagination.Last onClick={() => setActive(totalPages)} />
-    //         </Pagination>
-
-    //     } else {
-    //         return <Pagination>
-    //             <Pagination.First onClick={() => setActive(1)} />
-    //             <Pagination.Prev onClick={() => setActive(active - 1)} />
-    //             <Pagination.Ellipsis disabled />
-    //             {range(active - 4, totalPages, 1).map(createPaginationItem)}
-    //         </Pagination>
-    //     }
-
-    // } else {
-    //     return <Pagination>
-    //         {range(1, active + 4, 1).map(createPaginationItem)}
-    //         <Pagination.Ellipsis disabled />
-    //         <Pagination.Next onClick={() => setActive(active + 1)} />
-    //         <Pagination.Last onClick={() => setActive(totalPages)} />
-    //     </Pagination>
-    // }
 
 }
 
