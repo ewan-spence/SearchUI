@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    data: {}
+    data: {
+        documents: {},
+        noDocuments: {}
+    },
 };
 
 export const resultsSlice = createSlice({
@@ -9,12 +12,18 @@ export const resultsSlice = createSlice({
     initialState,
     reducers: {
         add: (state, action) => {
-            state.data[action.payload.resultType] = action.payload.data;
+            state.data.documents[action.payload.resultType] = action.payload.data.documents;
+            state.data.noDocuments[action.payload.resultType] = action.payload.data.noDocuments;
         },
         set: (state, action) => {
             state.data = {
-                [action.payload.resultType]: action.payload.data
-            };
+                documents: {
+                    [action.payload.resultType]: action.payload.data.documents
+                },
+                noDocuments: {
+                    [action.payload.resultType]: action.payload.data.noDocuments
+                }
+            }
         }
     }
 })

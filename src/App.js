@@ -2,17 +2,15 @@ import './App.css';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { useState } from 'react';
-
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 
 import SearchBar from './Components/SearchBar';
-import SearchResultTable from './Components/SearchResultTable';
 
 import { useGetFiltersQuery } from './App/searchApi';
 import { capitalize } from './helpers';
+import SearchResults from './Components/SearchResults';
 
 function App() {
 
@@ -30,20 +28,18 @@ function App() {
     });
   }
 
-  const [results, setResults] = useState({});
-
   return (
     <div className="App">
       <Navbar bg="dark">
         <Container>
           <Col style={{ alignItems: "center" }}>
-            <SearchBar filterOptions={sections} sortOptions={sorts} setResults={setResults} />
+            <SearchBar filterOptions={sections} sortOptions={sorts} />
           </Col>
         </Container>
       </Navbar>
 
       <Container className="mt-5">
-        <SearchResultTable sections={sections} results={results} />
+        <SearchResults sections={sections} />
       </Container>
     </div>
   );

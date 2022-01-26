@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Container, Dropdown, Form, Row, Stack } from "react-bootstrap";
 
-import { useLazySearchQuery } from '../App/searchApi';
-
 import { add, set } from '../App/resultsSlice';
 import { useDispatch } from "react-redux";
+import { useSearchMutation } from "../App/searchApi";
+import { addSearchTerm } from "../App/searchSlice";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -14,6 +14,8 @@ const useFocus = () => {
 }
 
 function SearchBar({ filterOptions, sortOptions, ...rest }) {
+    var itemsPerPage = 15;
+
     sortOptions[""] = [];
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +25,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
     const [filter, setFilter] = useState("");
     const [canSort, setCanSort] = useState(false);
 
-    const [trigger] = useLazySearchQuery(searchTerm);
+    const [trigger] = useSearchMutation();
 
     const dispatch = useDispatch();
 
@@ -65,14 +67,25 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
         }
     }
 
-    const searchWithFilter = (requestString, resultType, action) => {
-        trigger(requestString)
+    const searchWithFilter = (requestString, resultType, resultsAction) => {
+        var body = {
+            search: requestString,
+            page: 1,
+            itemsPerPage
+        }
+
+        trigger(body)
+            .unwrap()
             .then(response => {
                 var payload = {
                     resultType,
-                    data: response.data[resultType]
+                    data: {
+                        documents: response[resultType],
+                        noDocuments: response.totalResults
+                    }
                 };
-                dispatch(action(payload));
+                dispatch(resultsAction(payload));
+                dispatch(addSearchTerm({ resultType, data: requestString }));
             });
     }
 
