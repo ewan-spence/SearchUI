@@ -98,7 +98,7 @@ function SearchResultTable({ search, resultType, resultsOfType, resultsPerPage, 
                 })}
             </tbody>
         </Table>
-
+        {console.log(resultType, totalPages)}
         <FullPagination totalPages={totalPages} activePage={active} setActivePage={setActive} />
     </div>
 }

@@ -10,6 +10,12 @@ function FullPagination({ totalPages, activePage, setActivePage }) {
     var middle;
     var end
 
+    if (totalPages <= 5) {
+        beginning = <></>
+        middle = range(1, totalPages, 1).map(createPaginationItem);
+        end = <></>
+    }
+
     if (activePage > 5) {
         beginning = <>
             <Pagination.First onClick={() => setActivePage(1)} />
