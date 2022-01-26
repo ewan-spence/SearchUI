@@ -7,19 +7,33 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 
 import SearchBar from './Components/SearchBar';
-import SearchResultTable from './Components/SearchResultTable';
 
 import { useState } from 'react';
 import SavedSearch from './Components/SavedSearch';
+import { useGetFiltersQuery } from './App/searchApi';
+import { capitalize } from './helpers';
+import SearchResults from './Components/SearchResults';
+
+import { selectResults } from './App/resultsSlice';
+import { useSelector } from 'react-redux';
 
 function App() {
-  var sections = ["Reports", "Clients", "Portfolios"];
-  var sorts = [{ displayName: "name", keyword: "Name" },
-  { displayName: "joined date", keyword: "Joined" },
-  { displayName: "portfolio value", keyword: "Value" }]
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState({});
+  const { data, error, isLoading } = useGetFiltersQuery();
+
+  const results = useSelector(selectResults).documents;
+
+  var sections = [];
+  var sorts = {};
+
+  if (!isLoading && !error) {
+    sections = data.map(section => capitalize(section.filter));
+    sorts = {};
+
+    data.forEach(section => {
+      sorts[section.filter] = section.sorts;
+    });
+  }
 
   const [savedSearches, setSavedSearches] = useState(["@Clients; ross; /Name"]);
 
@@ -29,11 +43,11 @@ function App() {
       return <div>
         <h3 className="pb-3">Saved Searches</h3>
 
-        {savedSearches.map(search => <SavedSearch search={search} setSearchTerm={setSearchTerm} onClick={() => null} setResults={setResults} />)}
+        {savedSearches.map(search => <SavedSearch search={search} />)}
 
       </div>
     } else {
-      return <SearchResultTable sections={sections} results={results} />
+      return <SearchResults sections={sections} />
     }
   }
 
@@ -42,7 +56,7 @@ function App() {
       <Navbar bg="dark">
         <Container>
           <Col style={{ alignItems: "center" }}>
-            <SearchBar filterOptions={sections} sortOptions={sorts} searchTerm={searchTerm} setSearchTerm={setSearchTerm} setResults={setResults} />
+            <SearchBar filterOptions={sections} sortOptions={sorts} />
           </Col>
         </Container>
       </Navbar>

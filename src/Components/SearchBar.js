@@ -1,7 +1,10 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Container, Dropdown, Form, Row, Stack } from "react-bootstrap";
 
-const axios = require('axios');
+import { add, set } from '../App/resultsSlice';
+import { useDispatch } from "react-redux";
+import { useSearchMutation } from "../App/searchApi";
+import { addSearchTerm } from "../App/searchSlice";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -10,27 +13,86 @@ const useFocus = () => {
     return [htmlElRef, setFocus]
 }
 
-function SearchBar({ filterOptions, sortOptions, searchTerm, setSearchTerm, setResults, ...rest }) {
+function SearchBar({ filterOptions, sortOptions, ...rest }) {
+    var itemsPerPage = 15;
+
+    sortOptions[""] = [];
+
+    const [searchTerm, setSearchTerm] = useState("");
 
     const [focusRef, setFocus] = useFocus();
+
+    const [filter, setFilter] = useState("");
+    const [canSort, setCanSort] = useState(false);
+
+    const [trigger] = useSearchMutation();
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        var searchList = searchTerm.split(";").map(term => term.trim());
+        var checked = false;
+
+        searchList.forEach(term => {
+            if (term.startsWith('@')) {
+                checked = true;
+                var check = term.substring(1).toLowerCase()
+
+                if (Object.keys(sortOptions).includes(check)) {
+                    setFilter(check);
+                    setCanSort(true);
+                    return;
+                }
+                else setCanSort(false);
+                return;
+            };
+        });
+
+        if (!checked) {
+            setCanSort(false);
+        }
+    }, [searchTerm, sortOptions])
 
     const onSubmit = (event) => {
         event.preventDefault();
 
-        var url = "https://localhost:44306/api/Search?search=" + searchTerm;
+        if (searchTerm.includes("@")) {
+            searchWithFilter(searchTerm, filter.toLowerCase(), set);
+        } else {
+            filterOptions.forEach((option) => {
+                var filteredSearchTerm = `@${option}; ` + searchTerm;
 
-        axios.get(url)
-            .then(res => {
-                setResults(res.data);
+                searchWithFilter(filteredSearchTerm, option.toLowerCase(), add);
             })
-            .catch(_ => {
-                setResults({});
-            })
+        }
     }
 
-    const removeFilter = (event) => {
+    const searchWithFilter = (requestString, resultType, resultsAction) => {
+        var body = {
+            search: requestString,
+            page: 1,
+            itemsPerPage
+        }
+
+        trigger(body)
+            .unwrap()
+            .then(response => {
+                var payload = {
+                    resultType,
+                    data: {
+                        documents: response[resultType],
+                        noDocuments: response.totalResults
+                    }
+                };
+                dispatch(resultsAction(payload));
+                dispatch(addSearchTerm({ resultType, data: requestString }));
+            });
+    }
+
+
+    const removeFilter = (newTerm) => {
         // Split the current input on ; and trim whitespace
-        var searchList = searchTerm.split(';').map(term => term.trim());
+        var searchList = newTerm.split(';').map(term => term.trim());
 
         for (var index = 0; index < searchList.length; index++) {
             var term = searchList[index];
@@ -42,32 +104,30 @@ function SearchBar({ filterOptions, sortOptions, searchTerm, setSearchTerm, setR
             }
         }
 
-        if (event.target.id === "") {
-            setSearchTerm(searchList.join('; '));
-        } else {
-            // Join the list of terms together
-            setSearchTerm("@" + event.target.id + "; " + searchList.join('; '))
-        }
 
-        setFocus();
+        return searchList.join('; ');
     }
 
     // Add the selected filter to the search text
     const onFilterSelect = (event) => {
+        var newTerm = searchTerm;
 
         // Handle removing previous filters
         if (searchTerm.includes('@')) {
-            removeFilter(event);
+            newTerm = event.target.id + removeFilter(newTerm);
         } else {
-            setSearchTerm("@" + event.target.id + "; " + searchTerm);
+            newTerm = event.target.id + searchTerm;
         }
+
+        newTerm = removeSort(newTerm);
+        setSearchTerm(newTerm);
 
         setFocus();
     }
 
-    const removeSort = (event) => {
+    const removeSort = (newTerm) => {
         // Split the current input on ; and trim whitespace
-        var searchList = searchTerm.split(';').map(term => term.trim());
+        var searchList = newTerm.split(';').map(term => term.trim());
 
         for (var index = 0; index < searchList.length; index++) {
             var term = searchList[index];
@@ -79,23 +139,19 @@ function SearchBar({ filterOptions, sortOptions, searchTerm, setSearchTerm, setR
             }
         }
 
-        if (event.target.id === "") {
-            setSearchTerm(searchList.join('; '));
-        } else {
-            // Join the list of terms together
-            setSearchTerm(searchList.join('; ') + "; " + event.target.id);
-        }
-
-        setFocus();
+        return searchList.join("; ")
     }
 
     const onSortSelect = (event) => {
-        if (searchTerm.includes('/') || searchTerm.includes('\\') || event.target.id === "") {
-            removeSort(event);
+        var newTerm = searchTerm;
+
+        if (searchTerm.includes('/') || searchTerm.includes('\\')) {
+            newTerm = removeSort(newTerm) + event.target.id;
         } else {
-            setSearchTerm(searchTerm + "; " + event.target.id);
+            newTerm = searchTerm + event.target.id;
         }
 
+        setSearchTerm(newTerm);
         setFocus();
     }
 
@@ -110,41 +166,41 @@ function SearchBar({ filterOptions, sortOptions, searchTerm, setSearchTerm, setR
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={removeFilter}>
+                            <Dropdown.Item id="" onClick={onFilterSelect}>
                                 Search for everything
                             </Dropdown.Item>
                             {filterOptions.map((option) => {
-                                return <Dropdown.Item id={option} onClick={onFilterSelect}>Search for {option.toLowerCase()}</Dropdown.Item>
+                                return <Dropdown.Item id={"@" + option + "; "} onClick={onFilterSelect}>Search for {option.toLowerCase()}</Dropdown.Item>
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
 
                     {/* Sorts */}
-                    <Dropdown autoclose={true}>
-                        <Dropdown.Toggle style={{ borderRadius: 0 }}>
+                    <Dropdown>
+                        <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
                             Sort (Ascending)
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={removeSort}>
+                            <Dropdown.Item id="" onClick={onSortSelect}>
                                 Default sort
                             </Dropdown.Item>
-                            {sortOptions.map((option) => {
-                                return <Dropdown.Item id={"/".concat(option.keyword)} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
+                            {sortOptions[filter].map((option) => {
+                                return <Dropdown.Item id={"; /" + option.keyword} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown>
-                        <Dropdown.Toggle style={{ borderRadius: 0 }}>
+                        <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
                             Sort (Descending)
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={removeSort}>
+                            <Dropdown.Item id="" onClick={onSortSelect}>
                                 Default sort
                             </Dropdown.Item>
-                            {sortOptions.map((option) => {
-                                return <Dropdown.Item id={"\\".concat(option.keyword)} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
+                            {sortOptions[filter].map((option) => {
+                                return <Dropdown.Item id={"; \\" + option.keyword} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
@@ -162,7 +218,7 @@ function SearchBar({ filterOptions, sortOptions, searchTerm, setSearchTerm, setR
         <Row>
 
         </Row>
-    </Container>
+    </Container >
 
 }
 
