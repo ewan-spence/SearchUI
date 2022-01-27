@@ -38,7 +38,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
                 checked = true;
                 var check = term.substring(1).toLowerCase()
 
-                if (Object.keys(sortOptions).includes(check) && check != "") {
+                if (Object.keys(sortOptions).includes(check) && check !== "") {
                     setFilter(check);
                     console.log(check);
                     setCanSort(true);
