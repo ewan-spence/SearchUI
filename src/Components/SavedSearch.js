@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Spinner } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { useGetSavedSearchesQuery } from '../App/searchApi';
-import {selectSavedSearches, addSavedSearches} from '../App/searchSlice';
+import { selectSavedSearches, addSavedSearches } from '../App/searchSlice';
 
 function SavedSearch({ searchTerm, setSearchTerm, submit }) {
 
@@ -38,15 +38,15 @@ function SavedSearch({ searchTerm, setSearchTerm, submit }) {
     const renderSavedSearches = () => {
 
         const savedSearches = data.map((savedSearch, index) => (
-            <Card key={index} onClick={() => setSavedSearch(savedSearch.search)} style={{ cursor: "pointer", padding: 8, backgroundColor: "whitesmoke"  }}>
+            <Card key={index} onClick={() => setSavedSearch(savedSearch.search)} style={{ cursor: "pointer", padding: 8, backgroundColor: "whitesmoke" }}>
                 <Card.Subtitle>{savedSearch.search}</Card.Subtitle>
                 <Card.Text>({formatSearchDescription(savedSearch.search)})</Card.Text>
             </Card>
         ));
 
         return (
-            <div style={{ position: "fixed", marginTop: 4}}>
-                <Card style={{padding: 8, backgroundColor: "whitesmoke"}}>
+            <div style={{ position: "fixed", marginTop: 4 }}>
+                <Card style={{ padding: 8, backgroundColor: "whitesmoke" }}>
                     <Card.Title>Saved Searches</Card.Title>
                 </Card>
                 {savedSearches}
@@ -54,18 +54,25 @@ function SavedSearch({ searchTerm, setSearchTerm, submit }) {
         )
     };
 
+    const renderLoadingError = () => {
+        return (
+            <div style={{ position: "fixed", marginTop: 4, width: 400 }}>
+                <Card style={{ padding: 8, backgroundColor: "whitesmoke" }}>
+                    <Card.Subtitle>Could not load saved searches</Card.Subtitle>
+                </Card>
+            </div>
+        )
+    }
+
     const renderComponent = () => {
         if (data) {
             return renderSavedSearches();
         }
         else if (error) {
-            return "Could not load saved searches";
-        }
-        else if (isLoading) {
-            return "Loading";
+            return renderLoadingError();
         }
         else {
-            return "Unknown error occurred.";
+            return null;
         }
     };
 
