@@ -13,10 +13,17 @@ export const searchApi = createApi({
         }),
         getFilters: builder.query({
             query: () => '/filters'
+        }),
+        getSavedSearches: builder.query({
+            query: (id) => ({
+                url: `saved?id=${id}`,
+                method: 'GET'
+            })
         })
     })
 })
 
 export const {
     useSearchMutation,
-    useGetFiltersQuery } = searchApi;
+    useGetFiltersQuery,
+    useGetSavedSearchesQuery } = searchApi;

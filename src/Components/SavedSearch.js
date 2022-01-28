@@ -1,28 +1,26 @@
 import axios from "axios";
+import { useEffect } from "react";
 import { Card } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { useGetSavedSearchesQuery } from '../App/searchApi';
+import {selectSavedSearches, addSavedSearches} from '../App/searchSlice';
 
-function SavedSearch({ search, setSearchTerm, setResults }) {
-    const sendSavedSearch = (event) => {
-        setSearchTerm(search);
-        var url = "https://localhost:44306/api/Search?search=" + search;
+function SavedSearch({ searchTerm, setSearchTerm, submit }) {
 
-        axios.get(url)
-            .then(res => {
-                setResults(res.data);
-            })
-            .catch(_ => {
-                setResults({});
-            })
-    }
+    const dispatch = useDispatch();
+    const { data, error, isLoading } = useGetSavedSearchesQuery(0);
+
+
+    const setSavedSearch = (search) => {
+        setSearchTerm(() => search);
+    };
 
     const formatSearchDescription = (search) => {
         var description = "";
 
         var searchList = search.split(";").map(term => term.trim());
-        console.log(searchList);
 
         searchList.forEach(term => {
-            console.log(term);
             if (term.startsWith("@") && !description.includes("Search for")) {
                 description = "Search for " + term.substring(1).toLowerCase() + ", " + description;
             } else if (term.startsWith("/") && !description.includes("sorting by")) {
@@ -35,12 +33,44 @@ function SavedSearch({ search, setSearchTerm, setResults }) {
         });
 
         return description;
-    }
+    };
 
-    return <Card onClick={sendSavedSearch} style={{ cursor: "pointer" }}>
-        <Card.Title>{formatSearchDescription(search)}</Card.Title>
-        <Card.Subtitle>{search}</Card.Subtitle>
-    </Card>
+    const renderSavedSearches = () => {
+
+        const savedSearches = data.map((savedSearch, index) => (
+            <Card key={index} onClick={() => setSavedSearch(savedSearch.search)} style={{ cursor: "pointer", padding: 8, backgroundColor: "whitesmoke"  }}>
+                <Card.Subtitle>{savedSearch.search}</Card.Subtitle>
+                <Card.Text>({formatSearchDescription(savedSearch.search)})</Card.Text>
+            </Card>
+        ));
+
+        return (
+            <div style={{ position: "fixed", marginTop: 4}}>
+                <Card style={{padding: 8, backgroundColor: "whitesmoke"}}>
+                    <Card.Title>Saved Searches</Card.Title>
+                </Card>
+                {savedSearches}
+            </div>
+        )
+    };
+
+    const renderComponent = () => {
+        if (data) {
+            return renderSavedSearches();
+        }
+        else if (error) {
+            return "Could not load saved searches";
+        }
+        else if (isLoading) {
+            return "Loading";
+        }
+        else {
+            return "Unknown error occurred.";
+        }
+    };
+
+    return renderComponent();
+
 }
 
 export default SavedSearch;

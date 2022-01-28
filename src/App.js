@@ -35,17 +35,10 @@ function App() {
     });
   }
 
-  const [savedSearches, setSavedSearches] = useState(["@Clients; ross; /Name"]);
-
   const mainComponent = () => {
 
     if (Object.keys(results).length === 0) {
-      return <div>
-        <h3 className="pb-3">Saved Searches</h3>
-
-        {savedSearches.map(search => <SavedSearch search={search} />)}
-
-      </div>
+      return null;
     } else {
       return <SearchResults sections={sections} />
     }

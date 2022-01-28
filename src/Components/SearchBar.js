@@ -5,6 +5,7 @@ import { add, set } from '../App/resultsSlice';
 import { useDispatch } from "react-redux";
 import { useSearchMutation } from "../App/searchApi";
 import { addSearchTerm } from "../App/searchSlice";
+import SavedSearch from "./SavedSearch";
 
 const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -13,9 +14,9 @@ const useFocus = () => {
     return [htmlElRef, setFocus]
 }
 
-function SearchBar({ filterOptions, sortOptions, ...rest }) {
+function SearchBar({filterOptions, sortOptions, ...rest }) {
     var itemsPerPage = 15;
-
+    const [showSavedSearches, setShowSavedSearches] = useState(false);
     sortOptions[""] = [];
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -54,8 +55,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
     }, [searchTerm, sortOptions])
 
     const onSubmit = (event) => {
-        event.preventDefault();
-
+        event && event.preventDefault();
         if (searchTerm.includes("@")) {
             searchWithFilter(searchTerm, filter.toLowerCase(), set);
         } else {
@@ -65,6 +65,11 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
                 searchWithFilter(filteredSearchTerm, option.toLowerCase(), add);
             })
         }
+    }
+
+    const onSubmitSavedSearch = (search) => {
+        
+        setSearchTerm(() => search, () => onSubmit(search))
     }
 
     const searchWithFilter = (requestString, resultType, resultsAction) => {
@@ -77,6 +82,7 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
         trigger(body)
             .unwrap()
             .then(response => {
+                console.log(response)
                 var payload = {
                     resultType,
                     data: {
@@ -155,70 +161,83 @@ function SearchBar({ filterOptions, sortOptions, ...rest }) {
         setFocus();
     }
 
-    return <Container>
-        <Row>
-            <Stack direction="horizontal" gap={3} style={{ justifyContent: "center" }}>
-                <Stack direction="horizontal" gap={0}>
-                    {/* Filters */}
-                    <Dropdown>
-                        <Dropdown.Toggle style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}>
-                            Filters
-                        </Dropdown.Toggle>
+    return (
+        <div>
+            <Container>
+                <Row>
+                    <Stack direction="horizontal" gap={3} style={{ justifyContent: "center" }}>
+                        <Stack direction="horizontal" gap={0}>
+                            {/* Filters */}
+                            <Dropdown>
+                                <Dropdown.Toggle style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}>
+                                    Filters
+                                </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={onFilterSelect}>
-                                Search for everything
-                            </Dropdown.Item>
-                            {filterOptions.map((option) => {
-                                return <Dropdown.Item id={"@" + option + "; "} onClick={onFilterSelect}>Search for {option.toLowerCase()}</Dropdown.Item>
-                            })}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item id="" onClick={onFilterSelect}>
+                                        Search for everything
+                                    </Dropdown.Item>
+                                    {filterOptions.map((option) => {
+                                        return <Dropdown.Item id={"@" + option + "; "} onClick={onFilterSelect}>Search for {option.toLowerCase()}</Dropdown.Item>
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown>
 
-                    {/* Sorts */}
-                    <Dropdown>
-                        <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
-                            Sort (Ascending)
-                        </Dropdown.Toggle>
+                            {/* Sorts */}
+                            <Dropdown>
+                                <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
+                                    Sort (Ascending)
+                                </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={onSortSelect}>
-                                Default sort
-                            </Dropdown.Item>
-                            {sortOptions[filter].map((option) => {
-                                return <Dropdown.Item id={"; /" + option.keyword} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
-                            })}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    <Dropdown>
-                        <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
-                            Sort (Descending)
-                        </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item id="" onClick={onSortSelect}>
+                                        Default sort
+                                    </Dropdown.Item>
+                                    {sortOptions[filter].map((option) => {
+                                        return <Dropdown.Item id={"; /" + option.keyword} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <Dropdown>
+                                <Dropdown.Toggle disabled={!canSort} style={{ borderRadius: 0 }}>
+                                    Sort (Descending)
+                                </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item id="" onClick={onSortSelect}>
-                                Default sort
-                            </Dropdown.Item>
-                            {sortOptions[filter].map((option) => {
-                                return <Dropdown.Item id={"; \\" + option.keyword} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
-                            })}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item id="" onClick={onSortSelect}>
+                                        Default sort
+                                    </Dropdown.Item>
+                                    {sortOptions[filter].map((option) => {
+                                        return <Dropdown.Item id={"; \\" + option.keyword} onClick={onSortSelect}>Sort by {option.displayName.toLowerCase()}</Dropdown.Item>
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown>
 
-                    <Form onSubmit={onSubmit}>
-                        <Form.Group id="search" controlId="searchinput" >
-                            <Form.Control style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} ref={focusRef} placeholder="Search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Stack>
+                            <Form onSubmit={onSubmit}>
+                                <Form.Group id="search" controlId="searchinput" >
+                                    <Form.Control autoComplete={"off"} 
+                                    onFocus={() => setShowSavedSearches(true)}
+                                    style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} 
+                                    ref={focusRef} placeholder="Search" 
+                                    value={searchTerm} 
+                                    onChange={(event) => setSearchTerm(event.target.value)}
+                                    onBlur={() => {setTimeout(() => setShowSavedSearches(false), 250)}}
+                                    />
+                                </Form.Group>
+                                
+                            {showSavedSearches && <SavedSearch setSearchTerm={setSearchTerm} submit={onSubmit}/>}
+                            </Form>
 
-                <Button onClick={onSubmit}>Search</Button>
-            </Stack>
-        </Row>
-        <Row>
+                        </Stack>
+                        <Button onClick={onSubmit}>Search</Button>
+                    </Stack>
+                </Row>
+                <Row>
 
-        </Row>
-    </Container >
+                </Row>
+            </Container >
+        </div>
+    )
 
 }
 
